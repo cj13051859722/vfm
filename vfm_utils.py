@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-from ast import List
 import numpy as np
 from collections import defaultdict
 import math
