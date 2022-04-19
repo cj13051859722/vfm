@@ -1,20 +1,21 @@
+# -*- coding: UTF-8 -*-
 """
-ansys巴西劈裂均质 0.32 3.75
+ansys巴西劈裂均质 0.32 3.75e9
 python vfm.py --formate=ansys --data_file=data/bxpl_hom.txt --width=0.1 --height=0.1 --force=-1470 --thickness=0.008 --homogenous=1 --vfs=4,5
-ansys巴西劈裂非均质
+ansys巴西劈裂非均质 石英泊松比0.08 其余物质泊松比0.26 石英弹模9.64e10 其余物质弹模7.0e10
 python vfm.py --formate=ansys --data_file=data/bxpl_non.txt --width=0.05 --height=0.05 --force=-20434 --thickness=0.01 --vfs=16,17,18,19
-ansys三点弯曲均质 0.32 3.75
+ansys三点弯曲均质 0.32 3.75e9
 python vfm.py --formate=ansys --data_file=data/sdw_hom.txt --width=0.2 --height=0.05 --force=-1382 --thickness=0.008 --homogenous=1 --vfs=1,7
-ansys三点弯曲非均质
+ansys三点弯曲非均质 石英泊松比0.08 其余物质泊松比0.26 石英弹模9.64e10 其余物质弹模7.0e10
 python vfm.py --formate=ansys --data_file=data/sdw_non.txt --width=0.2 --height=0.05 --force=-1705 --thickness=0.01 --vfs=0,1,6,7
 
-dic巴西劈裂均质 0.32 3.75
+dic巴西劈裂均质 0.32 3.75e9
 python vfm.py --formate=dic --data_file=data/bxpl_hom.mat --width=0.1 --height=0.1 --force=-1470 --thickness=0.008 --homogenous=1 --vfs=4,5
-dic巴西劈裂非均质
+dic巴西劈裂非均质 石英泊松比0.08 其余物质泊松比0.26 石英弹模9.64e10 其余物质弹模7.0e10
 python vfm.py --formate=dic  --image_file=data/bxpl_non.jpg --data_file=data/bxpl_non.mat --width=0.05 --height=0.05 --force=-20434 --thickness=0.01 --vfs=16,17,18,19
-dic三点弯曲均质 0.32 3.75
+dic三点弯曲均质 0.32 3.75e9
 python vfm.py --formate=dic --data_file=data/sdw_hom.mat --width=0.2 --height=0.05 --force=-1382 --thickness=0.008 --homogenous=1 --vfs=1,7
-dic三点弯曲非均质
+dic三点弯曲非均质 石英泊松比0.08 其余物质泊松比0.26 石英弹模9.64e10 其余物质弹模7.0e10
 python vfm.py --formate=dic --image_file=data/sdw_non.jpg --data_file=data/sdw_non.mat --width=0.2 --height=0.05 --force=-1705 --thickness=0.01 --vfs=0,1,6,7
 """
 import numpy as np

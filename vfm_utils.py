@@ -1,26 +1,18 @@
 # -*- coding: UTF-8 -*-
 from ast import List
-from cmath import pi
-import os
-
-import matplotlib.pyplot as plt
-import matplotlib
 import numpy as np
 from collections import defaultdict
-import scipy.io as scio
 import math
-import random
-from other_test.strain import strain_bxpl_ykl
 import cv2
+import scipy.io as scio
 
 # 虚场法
 class VIRTUAL_FIELD:
     def __init__(self, vals, visual, span):
         """
-        :param visual: DIC摄像区域
-        :param span: 跨距
-        :param visual: 视场
         :param vals: 材料的基本参数格式：[width,height]
+        :param visual: DIC摄像区域 对三点弯曲虚场有效
+        :param span: 跨距 对三点弯曲虚场有效
         """
         self.width = vals[0]
         self.height = vals[1]
@@ -80,7 +72,7 @@ class VIRTUAL_FIELD:
         v=−y
         :param x1:x1坐标
         :param x2:x2坐标
-        :return: 虚场结果 三个的虚应变和顶部在y方向的位移
+        :return: 虚场结果 三个的虚应变和顶部在y方向的位移 下同
         """
         sigma1 = 0
         sigma2 = -1
@@ -92,9 +84,6 @@ class VIRTUAL_FIELD:
         """
         u= xy
         v=y(y-h)
-        :param x1:x1坐标
-        :param x2:x2坐标
-        :return: 应变值
         """
         sigma1 = x2
         sigma2 = 2 * x2 - self.height
@@ -106,9 +95,6 @@ class VIRTUAL_FIELD:
         """
         u=x**2-span**2
         v=0
-        :param x1:x1坐标
-        :param x2:x2坐标
-        :return: 应变值
         """
         sigma1 = 2 * x1
         sigma2 = 0
@@ -120,9 +106,6 @@ class VIRTUAL_FIELD:
         """
         u= y**2
         v= y(x-h)
-        :param x1:x1坐标
-        :param x2:x2坐标
-        :return: 应变值
         """
         sigma1 = 0
         sigma2 = x1 - self.height
@@ -134,9 +117,6 @@ class VIRTUAL_FIELD:
         """
         u=0
         v=y
-        :param x1:x1坐标
-        :param x2:x2坐标
-        :return: 应变值
         """
         sigma1 = 0
         sigma2 = 1
@@ -148,9 +128,6 @@ class VIRTUAL_FIELD:
         """
         u=xy
         v=0
-        :param x1:x1坐标
-        :param x2:x2坐标
-        :return: 应变值
         """
         sigma1 = x2
         sigma2 = 0
@@ -162,9 +139,6 @@ class VIRTUAL_FIELD:
         """
         u=-xy
         v=(x**2-span**2)/2
-        :param x1:x1坐标
-        :param x2:x2坐标
-        :return: 应变值
         """
         sigma1 = -x2
         sigma2 = 0
@@ -176,9 +150,6 @@ class VIRTUAL_FIELD:
         """
         u=0
         v=(x**2-span**2)/2
-        :param x1:x1坐标
-        :param x2:x2坐标
-        :return: 应变值
         """
         sigma1 = 0
         sigma2 = 0
@@ -190,9 +161,6 @@ class VIRTUAL_FIELD:
         """
         u= x
         v= 0
-        :param x1:x1坐标
-        :param x2:x2坐标
-        :return: 应变值
         """
         sigma1 = 1
         sigma2 = 0
@@ -202,12 +170,9 @@ class VIRTUAL_FIELD:
 
     def Virtual9(self, x1, x2):
         """
-        〖𝑢_1^∗〗^((4))= 0
-        〖𝑢_2^∗〗^((4))= x1+b when -span<x1<0
-        〖𝑢_2^∗〗^((4))= -x1+b when span<x1<0
-        :param x1:x1坐标
-        :param x2:x2坐标
-        :return: 应变值
+        u= 0
+        v= x1+b when -span<x1<0
+        v= -x1+b when span<x1<0
         """
         sigma1 = 0
         sigma2 = 0
@@ -222,11 +187,8 @@ class VIRTUAL_FIELD:
 
     def Virtual10(self, x1, x2):
         """
-        〖𝑢_1^∗〗^((4))= x1**2-visual**2   -visual<x1<visual
-        〖𝑢_2^∗〗^((4))= 0
-        :param x1:x1坐标
-        :param x2:x2坐标
-        :return: 应变值
+        u= x1**2-visual**2   -visual<x1<visual
+        v= 0
         """
         if abs(x1) < self.visual:
             sigma1 = 2 * x1
@@ -239,11 +201,8 @@ class VIRTUAL_FIELD:
 
     def Virtual11(self, x1, x2):
         """
-        〖𝑢_1^∗〗^((4))= (x1**2-visual**2)*x2   -visual<x1<visual
-        〖𝑢_2^∗〗^((4))= 0
-        :param x1:x1坐标
-        :param x2:x2坐标
-        :return: 应变值
+        u= (x1**2-visual**2)*x2   -visual<x1<visual
+        v= 0
         """
         if abs(x1) < self.visual:
             sigma1 = 2 * x1 * x2
@@ -259,11 +218,8 @@ class VIRTUAL_FIELD:
 
     def Virtual12(self, x1, x2):
         """
-        〖𝑢_1^∗〗^((4))= 0
-        〖𝑢_2^∗〗^((4))= x1**2-visual**2 -visual<x1<visual
-        :param x1:x1坐标
-        :param x2:x2坐标
-        :return: 应变值
+        u= 0
+        v= x1**2-visual**2 -visual<x1<visual
         """
         sigma1 = 0
         sigma2 = 0
@@ -276,12 +232,9 @@ class VIRTUAL_FIELD:
 
     def Virtual13(self, x1, x2):
         """
-        〖𝑢_1^∗〗^((4))= x1+b when -span<x1<0
-        〖𝑢_1^∗〗^((4))= -x1+b when span<x1<0
-        〖𝑢_2^∗〗^((4))= 0
-        :param x1:x1坐标
-        :param x2:x2坐标
-        :return: 应变值
+        u= x1+b when -span<x1<0
+        u= -x1+b when span<x1<0
+        v= 0
         """
         if -self.visual <= x1 < 0:
             sigma1 = 1
@@ -296,11 +249,8 @@ class VIRTUAL_FIELD:
 
     def Virtual14(self, x1, x2):
         """
-        〖𝑢_1^∗〗^((4))= 0
-        〖𝑢_2^∗〗^((4))= 2*visual*sin(pi*x1/(2*visual)+pi/2)
-        :param x1:x1坐标
-        :param x2:x2坐标
-        :return: 应变值
+        u= 0
+        v= 2*visual*sin(pi*x1/(2*visual)+pi/2)
         """
         sigma1 = 0
         sigma2 = 0
@@ -310,16 +260,11 @@ class VIRTUAL_FIELD:
             sigma6 = 0
         u = 2 * self.visual / math.pi
         return [sigma1, sigma2, sigma6, u]
-    
-
 
     def Virtual15(self, x1, x2):
         """
-        〖𝑢_1^∗〗^((4))= 0
-        〖𝑢_2^∗〗^((4))= (x1+self.visual)*x2、(-x1+self.visual)*x2
-        :param x1:x1坐标
-        :param x2:x2坐标
-        :return: 应变值
+        u= 0
+        v= (x1+self.visual)*x2、(-x1+self.visual)*x2
         """
         sigma1 = 0
         if -self.visual <= x1 < 0:
@@ -341,9 +286,6 @@ class VIRTUAL_FIELD:
         """
         u=0
         v=−sin(pi*y/h/2)
-        :param x1:x1坐标
-        :param x2:x2坐标
-        :return: 虚场结果 三个的虚应变和顶部在y方向的位移
         """
         sigma1 = 0
         sigma2 = -math.pi*math.cos(math.pi*x2/self.height*0.5)/self.height*0.5
@@ -355,9 +297,6 @@ class VIRTUAL_FIELD:
         """
         u=e**(x/height)
         v=0
-        :param x1:x1坐标
-        :param x2:x2坐标
-        :return: 虚场结果 三个的虚应变和顶部在y方向的位移
         """
         sigma1 = math.exp(x1/self.height)/self.height
         sigma2 = 0
@@ -369,9 +308,6 @@ class VIRTUAL_FIELD:
         """
         u=0
         v=-y**3
-        :param x1:x1坐标
-        :param x2:x2坐标
-        :return: 虚场结果 三个的虚应变和顶部在y方向的位移
         """
         sigma1 = 0
         sigma2 = -3*x2**2
@@ -383,9 +319,6 @@ class VIRTUAL_FIELD:
         """
         u=e**(x**2/height)
         v=0
-        :param x1:x1坐标
-        :param x2:x2坐标
-        :return: 虚场结果 三个的虚应变和顶部在y方向的位移
         """
         sigma1 = 2*x1*math.exp(x1**2/self.height)/self.height
         sigma2 = 0
@@ -394,12 +327,13 @@ class VIRTUAL_FIELD:
         return [sigma1, sigma2, sigma6, u]
 
 
-def valfromtxt(filename,noise=None):
+def valfromtxt(data_file,noise=None):
     """
-    :param filename: 带解析文件名
-    :return: 解析后的参数，格式为{node:[x1,x2,mat,area,strain_x,strain_y,strain_xy]}
+    读取ansys分析的应变场，对比真实图片，提取坐标点、材料属性、面积及应力。
+    :param data_file: 带解析的ansys数据
+    :return: vals参数表，格式为{node:[x1,x2,mat,area,strain_x,strain_y,strain_xy]}
     """
-    with open(filename, 'r') as f:
+    with open(data_file, 'r') as f:
         values = f.read().split("\n")
 
     ans = defaultdict(list)
@@ -424,14 +358,15 @@ def valfromtxt(filename,noise=None):
     return ans
 
 
-def valfrommat(data_file, image_file="", index=-1, height=50 * 10 ** -3, width=200 * 10 ** -3):
+def valfrommat(data_file, image_file, height, width, index=-1):
     """
-    :param image_file：图片位置
+    读取dic分析的应变场，对比真实图片，提取坐标点、材料属性、面积及应力。
     :param data_file：应变场数据位置
-    :param index: 第几个数据
+    :param image_file：图片位置，当均质时数据为""
+    :param index: 第几个数据，dic数据为最后一项
     :param height：试件高
     :param width：试件宽
-    :return: vals参数表,格式为{node:[x1,x2,mat,area,strain_x,strain_y,strain_xy]}
+    :return: vals参数表，格式为{node:[x1,x2,mat,area,strain_x,strain_y,strain_xy]}
     """
     # step1 读取mat文件和图片
     data = scio.loadmat(data_file)
@@ -474,9 +409,9 @@ def valfrommat(data_file, image_file="", index=-1, height=50 * 10 ** -3, width=2
             if strain_x[i][j]==0 and strain_y[i][j]==0 and strain_xy[i][j]==0:
                 continue
             node = node + 1
-            x1 = width*j/(cols-1)-width/2  # x方向
-            x2 = height - (height*i/(rows-1))  # y方向
-            vals[node] = [x1, x2, pic_bin[int((i+0.5)*x_subset+0.5)][int((j+0.5)*y_subset+0.5)], area, strain_x[i][j], strain_y[i][j], -strain_xy[i][j]]
+            x1 = width/cols*(j+0.5)-width/2  # x方向
+            x2 = height - height/rows*(i+0.5)  # y方向
+            vals[node] = [x1, x2, pic_bin[int((i+0.5)*x_subset+0.5)][int((j+0.5)*y_subset+0.5)], area, strain_x[i][j], strain_y[i][j], -strain_xy[i][j]] # dic和ansys的剪应变为负号关系
     return vals,strain_x,strain_y,strain_xy
 
 
@@ -484,8 +419,8 @@ def getab(vals, att, visual=40 * 10 ** -3, span=90 * 10 ** -3, vfs=None):
     """
     :param vals: 参数表,格式为{node:[x1,x2,mat,area,strain_x,strain_y,strain_xy]}
     :param att: [width, height, F, t]
-    :param visual: DIC摄像区域
-    :param span: 跨距
+    :param visual: DIC摄像区域 对三点弯曲虚场有效
+    :param span: 跨距 对三点弯曲虚场有效
     :param vfs：虚场编号，若无，则计算所有虚场
     :return: a,b的numpy矩阵
     """
@@ -513,15 +448,6 @@ def bias(x, x_ori):
 
 
 # 根据ansys数据生成dic数据
-def min_dis(x, y, value):
-    index, min = 0, float("INF")
-    for key, item in value.items():
-        if abs(item[0] - x) + abs(item[1] - y) < min:
-            min = abs(item[0] - x) + abs(item[1] - y)
-            index = key
-    return index
-
-
 def neartest_strain(x1,x2,vals_ansys:dict):
     """
     通过坐标值x1和x2，找到ansys结果中离该坐标最近的一个点并复制其参数
@@ -564,29 +490,16 @@ def mat_from_ansys(rows, cols,height,width,file_ansys,circle):
             # step2 获取最近的点的坐标及其属性
             neartest_strains=neartest_strain(x1,x2,vals_ansys) #[x1,x2,mat,area,strain_x,strain_y,strain_xy]
             vals_dic[node] = [x1, x2, neartest_strains[2], area, neartest_strains[4], neartest_strains[5], neartest_strains[6]]
-            strain_x[i][j],strain_y[i][j],strain_xy[i][j]=neartest_strains[4], neartest_strains[5], neartest_strains[6]
+            strain_x[i][j],strain_y[i][j],strain_xy[i][j]=neartest_strains[4], neartest_strains[5], -neartest_strains[6]  # dic和ansys的剪应变为负号关系
     return vals_dic,strain_x,strain_y,strain_xy
 
 
-def compare_strain(strain_ansys:List,strain_dic:List):
-    """
-    dic数据对比ansys数据的噪声大小及坏点
-    :param strain_ansys:ansys应变场 np.array
-    :param strain_dic:dic应变场  np.array
-    :return diff:误差
-    :return diff_num:异号
-    """
-    diff=np.abs(strain_dic-strain_ansys)/np.abs(strain_ansys)
-    diff_num=(strain_dic*strain_ansys<0)
-    return diff.tolist(),diff_num.tolist()
-
-
 if __name__ == "__main__":
-    # bxpl_hom
+    # # bxpl_hom
     # rows, cols,height,width=360,358,100 * 10 ** -3, 100 * 10 ** -3
-    # # file_ansys='../ansys/211122_1/strain_elem.txt'
+    # file_ansys='../ansys/bxpl_hom/strain_elem.txt'
     # # 生成
-    # # vals_ansysdic,strain_x_ansysdic,strain_y_ansysdic,strain_xy_ansysdic = mat_from_ansys(rows, cols,height,width,file_ansys,circle=True)
+    # vals_ansysdic,strain_x_ansysdic,strain_y_ansysdic,strain_xy_ansysdic = mat_from_ansys(rows, cols,height,width,file_ansys,circle=True)
     # # 保存至mat文件
     # data = {"Strains":{'plot_exx_ref_formatted':np.array(strain_x_ansysdic),\
     #         'plot_eyy_ref_formatted':np.array(strain_y_ansysdic),\
@@ -618,15 +531,26 @@ if __name__ == "__main__":
     #         }}
     # scio.savemat('./data/sdw_hom_copy.mat',data)
 
-    # sdw_non
-    rows, cols,height,width=119,478,50 * 10 ** -3, 200 * 10 ** -3
-    file_ansys='../ansys/sdw_non/strain_elem.txt'
-    # 生成
-    vals_ansysdic,strain_x_ansysdic,strain_y_ansysdic,strain_xy_ansysdic = mat_from_ansys(rows, cols,height,width,file_ansys,circle=False)
-    # 保存至mat文件
-    data = {"Strains":{'plot_exx_ref_formatted':np.array(strain_x_ansysdic),\
-            'plot_eyy_ref_formatted':np.array(strain_y_ansysdic),\
-            'plot_exy_ref_formatted':np.array(strain_xy_ansysdic),\
-            }}
-    scio.savemat('./data/sdw_non_copy.mat',data)
+    # # sdw_non
+    # rows, cols,height,width=119,478,50 * 10 ** -3, 200 * 10 ** -3
+    # file_ansys='../ansys/sdw_non/strain_elem.txt'
+    # # 生成
+    # vals_ansysdic,strain_x_ansysdic,strain_y_ansysdic,strain_xy_ansysdic = mat_from_ansys(rows, cols,height,width,file_ansys,circle=False)
+    # # 保存至mat文件
+    # data = {"Strains":{'plot_exx_ref_formatted':np.array(strain_x_ansysdic),\
+    #         'plot_eyy_ref_formatted':np.array(strain_y_ansysdic),\
+    #         'plot_exy_ref_formatted':np.array(strain_xy_ansysdic),\
+    #         }}
+    # scio.savemat('./data/sdw_non_copy.mat',data)
+
+    # # 其他
+    # data = scio.loadmat('data/bxpl_non_copy.mat')
+    # strain_x = data['Strains']['plot_exx_ref_formatted'][0][-1].tolist()
+    # strain_y = data['Strains']['plot_eyy_ref_formatted'][0][-1].tolist()
+    # strain_xy = data['Strains']['plot_exy_ref_formatted'][0][-1].tolist()
+    # data = {"Strains":{'plot_exx_ref_formatted':np.array(strain_x),\
+    #         'plot_eyy_ref_formatted':np.array(strain_y),\
+    #         'plot_exy_ref_formatted':-np.array(strain_xy),\
+    #         }}
+    # scio.savemat('./data/bxpl_non_copy.mat',data)
     print("ok")

@@ -1,0 +1,88 @@
+!文件运行：更换到该文件的地址 TODO /INPUT, D:\sys\vfm\ansys\bxpl_hom\bxpl_hom.txt
+/CWD,'D:\sys\vfm\ansys\bxpl_hom' !更换文件夹 TODO
+/FILNAME,bxpl_hom,0  
+/TITLE,bxpl_hom     !更换title
+/NOPR
+KEYW,PR_SET,1   
+KEYW,PR_STRUC,1 
+KEYW,PR_THERM,0 
+KEYW,PR_FLUID,0 
+KEYW,PR_ELMAG,0 
+KEYW,MAGNOD,0   
+KEYW,MAGEDG,0   
+KEYW,MAGHFE,0   
+KEYW,MAGELC,0   
+KEYW,PR_MULTI,0 
+/GO 
+/COM,  Structural   
+
+
+/PREP7 
+!设置材料属性
+ET,1,PLANE182   
+KEYOPT,1,1,0
+KEYOPT,1,3,3
+KEYOPT,1,6,0
+R,1,8e-3,  !厚度
+MP,EX,1,3.75e9    !弹模
+MP,PRXY,1,0.32   !泊松比
+MP,DENS,1,7e3
+!定义外面的大圆
+K,1,0,50e-3,,
+CIRCLE,1,50e-3
+AL,1,2,3,4
+
+!划分网格
+LSEL, , , ,1
+LESIZE,ALL,,,500,,,,,0
+LSEL, , , ,2
+LESIZE,ALL,,,500,,,,,0
+LSEL, , , ,3
+LESIZE,ALL,,,500,,,,,0
+LSEL, , , ,4
+LESIZE,ALL,,,500,,,,,0
+LSEL,ALL
+MSHAPE,0,2D !三角形单元
+MSHKEY,2
+AMESH,ALL
+
+!设置边界条件
+F,node(0,100e-3,0),FY,-1470
+D,node(0,0,0), ,0, , , ,UX,UY !约束底部三个点
+!D,node(0,0,0), ,0, , , ,UX,UY
+D,1501, ,0, , , ,UX,UY
+D,1502, ,0, , , ,UX,UY
+FINISH
+
+
+!求解
+/SOLU   
+/STATUS,SOLU
+SOLVE   
+FINISH  
+
+
+!后处理
+/POST1  
+/EFACET,1   
+PLNSOL, U,Y, 0,1.0  
+
+! 获取单元结果
+*get,emin, ELEM,0,NUM,MIN
+*get,emax, ELEM,0,NUM,MAX
+ETABLE,stx,EPTO,X     !Table 125
+ETABLE,sty,EPTO,Y
+ETABLE,stxy,EPTO,XY
+*CFOPEN,strain_elem,txt
+*do,i,emin,emax,1
+ *GET,s1,ELEM,i,ETAB,stx      !Table 172
+ *GET,s2,ELEM,i,ETAB,sty
+ *GET,s6,ELEM,i,ETAB,stxy
+ *GET,cx,ELEM,i,CENT,X      !Table 141
+ *GET,cy,ELEM,i,CENT,Y 
+ *GET,mat,ELEM,i,ATTR,MAT      !Table 141
+ *GET,area,ELEM,i,AREA
+ *vwrite,i,cx,cy,mat,area,s1,s2,s6
+ (F7.0,E12.3,E12.3,F4.0,E12.3,E12.3,E12.3,E12.3)  !https://max.book118.com/html/2017/0604/111616820.shtm
+*enddo
+*cfclose
